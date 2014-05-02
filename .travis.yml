@@ -11,7 +11,7 @@ env:
 install: pip install $DJANGO_PACKAGE markdown docutils --use-mirrors
 
 # Make sure migrations can be made (see issue: #20 https://github.com/jamesturk/django-markupfield/issues/20)
-before_script: django-admin.py makemigrations --settings=markupfield.tests.settings --pythonpath=.
+before_script: ./if_django1.7.py django-admin.py makemigrations --settings=markupfield.tests.settings --pythonpath=.
 
 script: django-admin.py test --settings=markupfield.tests.settings --pythonpath=.
 
