@@ -7,8 +7,14 @@ env:
     - DJANGO_PACKAGE="Django>=1.5,<1.6"
     - DJANGO_PACKAGE="Django>=1.6,<1.7"
     - DJANGO_PACKAGE="https://www.djangoproject.com/download/1.7b3/tarball/"
+
 install: pip install $DJANGO_PACKAGE markdown docutils --use-mirrors
+
+# Make sure migrations can be made (see issue: #20 https://github.com/jamesturk/django-markupfield/issues/20)
+before_script: django-admin.py makemigrations --settings=markupfield.tests.settings --pythonpath=.
+
 script: django-admin.py test --settings=markupfield.tests.settings --pythonpath=.
+
 notifications:
     email:
-        - james.p.turk@gmail.com
+        - travis@matt3o12.de
