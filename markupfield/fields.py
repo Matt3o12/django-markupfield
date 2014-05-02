@@ -8,6 +8,8 @@ from django.utils.encoding import smart_text
 from markupfield import widgets
 from markupfield import markup
 
+import re
+
 _rendered_field_name = lambda name: '_%s_rendered' % name
 _markup_type_field_name = lambda name: '%s_markup_type' % name
 
@@ -114,7 +116,17 @@ class MarkupField(models.TextField):
         super(MarkupField, self).__init__(verbose_name, name, **kwargs)
 
     def contribute_to_class(self, cls, name):
-        if not cls._meta.abstract:
+        # Fix for issue#20 (https://github.com/jamesturk/django-markupfield/issues/20)
+        #
+        # Warning: this might not work for further versions (when Django issue #22555
+        # https://code.djangoproject.com/ticket/22555 is fixed) since it expects the faked
+        # filed to already have the cortibuted fields (markup_type, and _%s_rendered)
+        
+        
+        expression = r"^__fake__\.%s$" % re.escape(cls.__name__)
+        cls_name = "%s.%s" % (cls.__module__, cls.__name__)
+        
+        if (not (cls._meta.abstract)) and (not re.match(expression, cls_name)):
             choices = zip([''] + self.markup_choices_list,
                           ['--'] + self.markup_choices_list)
             markup_type_field = models.CharField(
